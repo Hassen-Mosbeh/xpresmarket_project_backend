@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model category {
+  category_id    Int       @id @default(autoincrement())
+  category_name  String    @unique @db.VarChar(255)
+  descp_category String?   @db.Text
+  product        product[]
+}
+
+model product {
+  product_id   Int       @id @default(autoincrement())
+  product_name String    @db.VarChar(255)
+  description  String?   @db.Text
+  price        Decimal   @db.Decimal(10, 2)
+  stock        Int       @default(0)
+  status       Boolean?  @default(true)
+  image        String?   @db.VarChar(255)
+  category_id  Int?
+  category     category? @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "product_ibfk_1")
+
+  @@index([category_id], map: "category_id")
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  username         String?   @db.VarChar(191)
+  email            String    @unique
+  company_email    String?   @db.VarChar(255)
+  profile          String    @default("Buyer")
+  password         String
+  telephone        String    @db.VarChar(191)
+  company_name     String?   @db.VarChar(191)
+  company_adresse  String?   @db.VarChar(191)
+  company_tel      String?   @db.VarChar(191)
+  createdAt        DateTime  @default(now())
+  resetCode        String? 
+  resetCodeExpiresAt DateTime? 
+}
