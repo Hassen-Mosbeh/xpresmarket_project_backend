@@ -13,7 +13,18 @@ model category {
   descp_category String?   @db.Text
   product        product[]
 }
+model Contact {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(255)
+  email       String     @db.VarChar(255)
+  phone_number String    @db.VarChar(20)
+  subject     String     @db.VarChar(255)
+  content     String     @db.Text
+  user_id     Int
 
+
+
+}
 model product {
   product_id   Int       @id @default(autoincrement())
   product_name String    @db.VarChar(255)
