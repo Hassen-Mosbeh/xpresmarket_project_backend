@@ -195,35 +195,6 @@ export class AuthService {
   }
   
 
-  
-  // async verifyResetCode(email: string, resetCode: string) {
-  //   const user = await this.userService.findByEmail(email);
-  //   if (!user || user.resetCode !== resetCode) {
-  //     throw new BadRequestException('Invalid reset code');
-  //   }
-
-  //   if (!user.resetCodeExpiresAt || new Date() > new Date(user.resetCodeExpiresAt)) {
-  //     throw new BadRequestException('Reset code expired');
-  //   }
-
-  //   return { isValid: true };
-  // }
-
-  // async resetPassword(dto: ResetPasswordDto) {
-  //   const { email, resetCode, newPassword } = dto;
-
-  //   // Verify reset code first
-  //   await this.verifyResetCode(email, resetCode);
-
-  //   // Hash new password
-  //   const hashedPassword = await hash(newPassword, 10);
-
-  //   // Update password & remove reset code
-  //   await this.userService.updatePassword(email, hashedPassword);
-
-  //   return { message: 'Password reset successful' };
-  // }
-
   async validateUser(dto: LoginDto) {
     const user = await this.userService.findByEmail(dto.email);
     if (user && (await compare(dto.password, user.password))) {

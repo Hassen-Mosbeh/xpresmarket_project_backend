@@ -39,12 +39,17 @@ model product {
   @@index([category_id], map: "category_id")
 }
 
+enum Profile {
+  Buyer
+  Seller
+}
+
 model User {
   id               Int       @id @default(autoincrement())
   username         String?   @db.VarChar(191)
   email            String    @unique
   company_email    String?   @db.VarChar(255)
-  profile          String    @default("Buyer")
+  profile          Profile   @default(Buyer)
   password         String
   telephone        String    @db.VarChar(191)
   company_name     String?   @db.VarChar(191)
