@@ -13,18 +13,7 @@ model category {
   descp_category String?   @db.Text
   product        product[]
 }
-model Contact {
-  id          Int        @id @default(autoincrement())
-  name        String     @db.VarChar(255)
-  email       String     @db.VarChar(255)
-  phone_number String    @db.VarChar(20)
-  subject     String     @db.VarChar(255)
-  content     String     @db.Text
-  user_id     Int
 
-
-
-}
 model product {
   product_id   Int       @id @default(autoincrement())
   product_name String    @db.VarChar(255)
@@ -38,19 +27,31 @@ model product {
 
   @@index([category_id], map: "category_id")
 }
+model Contact {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  email        String   @db.VarChar(255)
+  phone_number String   @db.VarChar(20)
+  subject      String   @db.VarChar(255)
+  content      String   @db.Text
+  user_id      Int
+  user         User     @relation(fields: [user_id], references: [id]) // relation ici
+}
 
 model User {
-  id               Int       @id @default(autoincrement())
-  username         String?   @db.VarChar(191)
-  email            String    @unique
-  company_email    String?   @db.VarChar(255)
-  profile          String    @default("Buyer")
-  password         String
-  telephone        String    @db.VarChar(191)
-  company_name     String?   @db.VarChar(191)
-  company_adresse  String?   @db.VarChar(191)
-  company_tel      String?   @db.VarChar(191)
-  createdAt        DateTime  @default(now())
-  resetCode        String? 
+  id                 Int        @id @default(autoincrement())
+  username           String?    @db.VarChar(191)
+  email              String     @unique
+  company_email      String?    @db.VarChar(255)
+  profile            String     @default("Buyer")
+  password           String
+  telephone          String     @db.VarChar(191)
+  company_name       String?    @db.VarChar(191)
+  company_adresse    String?    @db.VarChar(191)
+  company_tel        String?    @db.VarChar(191)
+  createdAt          DateTime   @default(now())
+  resetCode          String? 
   resetCodeExpiresAt DateTime? 
+
+  contacts           Contact[]  // relation inverse
 }
