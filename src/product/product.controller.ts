@@ -8,11 +8,13 @@ import {
   Req,
   Res,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
-import { Product } from './product.model';
 import { Request, Response } from 'express';
 import { ProductService } from './product.service';
 import { product } from '@prisma/client';
+import { CreateProductDto } from './productDto/product.dto';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('api/v1/product')
 export class ProductController {
@@ -30,23 +32,27 @@ export class ProductController {
       result: result,
     });
   }
-
+  @UseGuards(JwtGuard)
   @Post()
-  async postProduct(@Body() postData: product): Promise<product> {
-    return this.productService.createProduct(postData);
+  async postProduct(
+    @Body() productDto: CreateProductDto,
+    @Req() req,
+  ): Promise<product> {
+    const sellerId = req.user.id; //
+    return this.productService.createProduct(productDto, sellerId);
   }
 
   @Get(':product_id')
   async getProduct(
     @Param('product_id') product_id: number,
-  ): Promise<Product | null> {
+  ): Promise<product | null> {
     return this.productService.getProduct(product_id);
   }
 
   @Delete(':product_id')
   async deleteProduct(
     @Param('product_id') product_id: number,
-  ): Promise<Product> {
+  ): Promise<product> {
     return this.productService.deleteProduct(product_id);
   }
 
@@ -61,8 +67,8 @@ export class ProductController {
   @Patch(':product_id')
   async updateProductPatch(
     @Param('product_id') product_id: number,
-    @Body() data: Partial<Product>
-  ){
+    @Body() data: Partial<product>,
+  ) {
     return this.productService.updateProduct(product_id, data);
   }
 }
