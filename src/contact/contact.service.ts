@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Contact } from '@prisma/client';
+import { CreateContactDto } from './contactdto/contact.dto';
 
 @Injectable()
 export class ContactService {
   constructor(private prisma: PrismaService) {}
 
+  // 🔹 Récupérer tous les contacts
   async findAll(): Promise<Contact[]> {
     return this.prisma.contact.findMany({
       include: {
         user: {
-          select: { id: true }, // Sélectionner uniquement l'ID de l'utilisateur
+          select: { id: true },
         },
       },
     });
@@ -22,21 +24,25 @@ export class ContactService {
       where: { id },
       include: {
         user: {
-          select: { id: true }, // Sélectionner uniquement l'ID de l'utilisateur
+          select: { id: true },
         },
       },
     });
   }
 
-  // 🔹 creation 
-  async create(data: { 
-    name: string; 
-    email: string; 
-    phone_number: string; 
-    subject: string; 
-    content: string; 
-    user_id: number;
-  }): Promise<Contact> {
-    return this.prisma.contact.create({ data });
+  // 🔹 Créer un contact (relation avec l'utilisateur via user_id)
+  async create(data: CreateContactDto): Promise<Contact> {  // Utiliser CreateContactDto ici
+    return this.prisma.contact.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        phone_number: data.phone_number,
+        subject: data.subject,
+        content: data.content,
+        user: {
+          connect: { id: data.user_id },  // Connexion avec l'utilisateur
+        },
+      },
+    });
   }
 }
