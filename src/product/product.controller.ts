@@ -72,9 +72,23 @@ export class ProductController {
   ) {
     return this.productService.updateProduct(product_id, data);
   }
+  
 
-  @Get('seller/:id')
-  async getSellerProducts(@Param('id', ParseIntPipe) sellerId: number) {
-    return this.productService.getProductsBySeller(sellerId);
+@UseGuards(JwtGuard)
+@Get('seller/:id')
+async getSellerProducts(@Param('id', ParseIntPipe) sellerId: number) {
+  try {
+    const products = await this.productService.getProductsBySeller(sellerId);
+    return {
+      success: true,
+      data: products
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message,
+      data: []
+    };
   }
+}
 }

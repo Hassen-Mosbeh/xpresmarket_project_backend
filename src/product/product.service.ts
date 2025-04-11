@@ -54,13 +54,15 @@ export class ProductService {
     });
   }
 
+  // product.service.ts
   async getProductsBySeller(sellerId: number) {
     const seller = await this.prisma.user.findUnique({
       where: { id: sellerId },
     });
 
+    // Return empty array instead of error for non-sellers
     if (!seller || seller.profile !== 'Seller') {
-      throw new Error('User is not a seller or does not exist');
+      return [];
     }
 
     return await this.prisma.product.findMany({
