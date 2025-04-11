@@ -9,6 +9,7 @@ import {
   Res,
   Patch,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ProductService } from './product.service';
@@ -70,5 +71,10 @@ export class ProductController {
     @Body() data: Partial<product>,
   ) {
     return this.productService.updateProduct(product_id, data);
+  }
+
+  @Get('seller/:id')
+  async getSellerProducts(@Param('id', ParseIntPipe) sellerId: number) {
+    return this.productService.getProductsBySeller(sellerId);
   }
 }

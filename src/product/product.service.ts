@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateProductDto } from './productDto/product.dto'; // Import the DTO
-import { product } from '@prisma/client';  // Import Prisma `product` type
+import { product } from '@prisma/client'; // Import Prisma `product` type
 
 @Injectable()
 export class ProductService {
@@ -18,11 +18,14 @@ export class ProductService {
     });
   }
 
-  async createProduct(data: CreateProductDto, ownerId: number): Promise<product> {
+  async createProduct(
+    data: CreateProductDto,
+    ownerId: number,
+  ): Promise<product> {
     return this.prisma.product.create({
       data: {
-        ...data,      // Directly spread the data from DTO into Prisma create
-        ownerId,      // Assign the seller as the owner of the product
+        ...data, // Directly spread the data from DTO into Prisma create
+        ownerId, // Assign the seller as the owner of the product
       },
     });
   }
@@ -48,6 +51,29 @@ export class ProductService {
   async deleteProduct(product_id: number): Promise<product> {
     return this.prisma.product.delete({
       where: { product_id: Number(product_id) },
+    });
+  }
+
+  async getProductsBySeller(sellerId: number) {
+    const seller = await this.prisma.user.findUnique({
+      where: { id: sellerId },
+    });
+
+    if (!seller || seller.profile !== 'Seller') {
+      throw new Error('User is not a seller or does not exist');
+    }
+
+    return await this.prisma.product.findMany({
+      where: {
+        ownerId: sellerId,
+        owner: {
+          profile: 'Seller',
+        },
+      },
+      include: {
+        owner: true,
+        category: true,
+      },
     });
   }
 }
