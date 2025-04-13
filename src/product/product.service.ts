@@ -1,8 +1,7 @@
-// src/product/product.service.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { CreateProductDto } from './productDto/product.dto'; // Import the DTO
-import { product } from '@prisma/client'; // Import Prisma `product` type
+import { CreateProductDto } from './productDto/product.dto'; 
+import { product } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
