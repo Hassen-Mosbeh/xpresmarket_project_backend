@@ -10,11 +10,13 @@ import {
   Patch,
   UseGuards,
   ParseIntPipe,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ProductService } from './product.service';
 import { product } from '@prisma/client';
-import { CreateProductDto } from './productDto/product.dto';
+import { CreateProductDto, GetProductDto, UpdateProductDto } from './productDto/product.dto';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('api/v1/product')
@@ -46,8 +48,8 @@ export class ProductController {
   @Get(':product_id')
   async getProduct(
     @Param('product_id') product_id: number,
-  ): Promise<product | null> {
-    return this.productService.getProduct(product_id);
+  ): Promise<GetProductDto | null> {
+    return await this.productService.getProduct(product_id) as unknown as GetProductDto;
   }
 
   @Delete(':product_id')
@@ -66,11 +68,12 @@ export class ProductController {
   // }
 
   @Patch(':product_id')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async updateProductPatch(
-    @Param('product_id') product_id: number,
-    @Body() data: Partial<product>,
+    @Param('product_id') product_id: string,
+    @Body() data: UpdateProductDto
   ) {
-    return this.productService.updateProduct(product_id, data);
+    return this.productService.updateProduct(Number(product_id), data);
   }
   
 

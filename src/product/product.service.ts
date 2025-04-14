@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { CreateProductDto } from './productDto/product.dto'; 
+import { CreateProductDto, UpdateProductDto } from './productDto/product.dto';
 import { product } from '@prisma/client';
 
 @Injectable()
@@ -14,6 +14,18 @@ export class ProductService {
   async getProduct(product_id: number): Promise<product | null> {
     return this.prisma.product.findUnique({
       where: { product_id: Number(product_id) },
+      include: {
+        owner: {
+          select: {
+            username: true, // Include only the username from the owner
+          },
+        },
+        category: {
+          select: {
+            category_name: true,
+          },
+        },
+      },
     });
   }
 
@@ -31,7 +43,7 @@ export class ProductService {
 
   async updateProduct(
     product_id: number,
-    data: Partial<product>,
+    data: UpdateProductDto,
   ): Promise<product> {
     return this.prisma.product.update({
       where: { product_id: Number(product_id) },
