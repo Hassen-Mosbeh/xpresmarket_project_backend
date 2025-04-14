@@ -1,7 +1,13 @@
-import { IsString, IsOptional, IsEmail, IsInt, IsIn } from 'class-validator';
+import { IsString, IsOptional, IsEmail, IsIn } from 'class-validator';
+
+// Définition de l'énumération Status
+export enum Status {
+  active = 'active',
+  inactive = 'inactive',
+  deleted = 'deleted',
+}
 
 export class CreateUserDto {
-
   @IsOptional()
   @IsString()
   username?: string;
@@ -9,12 +15,9 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
-  @IsOptional()
-  @IsString()
-  adresse?: string; 
 
   @IsString()
-  @IsIn(['Buyer', 'Seller'])
+  @IsIn(['Buyer', 'Seller','Admin'])
   profile: string;
 
   @IsString()
@@ -25,26 +28,27 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
-  company_name?: string; 
+  company_name?: string;
 
   @IsOptional()
   @IsString()
-  company_adresse?: string; 
+  company_adresse?: string;
 
   @IsOptional()
   @IsString()
   company_tel?: string;
+
+  // Validation du statut avec l'énumération
+  @IsOptional()
+  @IsIn([Status.active, Status.inactive, Status.deleted])  // Utilisation de l'énumération pour la validation
+  status?: Status;  // Utilisation de l'énumération ici aussi
 }
 
-export class UpdateUserDto{
-  @IsOptional()
-  @IsInt()
-  id?: number;
-
+export class UpdateUserDto {
   @IsOptional()
   @IsString()
   username?: string;
-  
+
   @IsOptional()
   @IsString()
   telephone?: string;
@@ -55,13 +59,18 @@ export class UpdateUserDto{
 
   @IsOptional()
   @IsString()
-  company_name?: string; 
+  company_name?: string;
 
   @IsOptional()
   @IsString()
-  company_adresse?: string; 
+  company_adresse?: string;
 
   @IsOptional()
   @IsString()
-  company_tel?: string; 
+  company_tel?: string;
+
+  // Validation du statut avec l'énumération
+  @IsOptional()
+  @IsIn([Status.active, Status.inactive, Status.deleted])  // Utilisation de l'énumération pour la validation
+  status?: Status;  // Utilisation de l'énumération ici aussi
 }

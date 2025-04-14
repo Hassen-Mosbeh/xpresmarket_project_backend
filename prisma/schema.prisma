@@ -30,13 +30,18 @@ model product {
 model Contact {
   id           Int      @id @default(autoincrement())
   name         String   @db.VarChar(255)
-  email        String   @db.VarChar(255)
+  email        String   @unique @db.VarChar(255) // rendre l'email unique
   phone_number String   @db.VarChar(20)
   subject      String   @db.VarChar(255)
   content      String   @db.Text
-  user_id      Int
-  user         User     @relation(fields: [user_id], references: [id]) // relation ici
 }
+enum Status {
+  active
+  inactive
+  deleted
+}
+
+
 
 model User {
   id                 Int        @id @default(autoincrement())
@@ -51,7 +56,8 @@ model User {
   company_tel        String?    @db.VarChar(191)
   createdAt          DateTime   @default(now())
   resetCode          String? 
-  resetCodeExpiresAt DateTime? 
+  resetCodeExpiresAt DateTime?
 
-  contacts           Contact[]  // relation inverse
+  status             Status     @default(active)
 }
+

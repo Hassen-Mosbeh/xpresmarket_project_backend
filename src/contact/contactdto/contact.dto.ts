@@ -1,5 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, IsNumber } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateContactDto {
   @IsNotEmpty()
@@ -20,8 +19,4 @@ export class CreateContactDto {
   @IsNotEmpty()
   @IsString()
   content: string;
-
-  @Type(() => Number) // permet à class-validator de convertir automatiquement user_id depuis une chaîne vers un nombre 
-  @IsNumber()
-  user_id: number;
 }

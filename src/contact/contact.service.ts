@@ -9,29 +9,18 @@ export class ContactService {
 
   // 🔹 Récupérer tous les contacts
   async findAll(): Promise<Contact[]> {
-    return this.prisma.contact.findMany({
-      include: {
-        user: {
-          select: { id: true },
-        },
-      },
-    });
+    return this.prisma.contact.findMany(); 
   }
 
   // 🔹 Récupérer un contact spécifique par ID
   async findOne(id: number): Promise<Contact | null> {
     return this.prisma.contact.findUnique({
       where: { id },
-      include: {
-        user: {
-          select: { id: true },
-        },
-      },
     });
   }
 
-  // 🔹 Créer un contact (relation avec l'utilisateur via user_id)
-  async create(data: CreateContactDto): Promise<Contact> {  // Utiliser CreateContactDto ici
+  // 🔹 Créer un contact (sans user_id)
+  async create(data: CreateContactDto): Promise<Contact> {
     return this.prisma.contact.create({
       data: {
         name: data.name,
@@ -39,9 +28,7 @@ export class ContactService {
         phone_number: data.phone_number,
         subject: data.subject,
         content: data.content,
-        user: {
-          connect: { id: data.user_id },  // Connexion avec l'utilisateur
-        },
+        // ✅ Supprimé user: { connect: ... }
       },
     });
   }
