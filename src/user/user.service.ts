@@ -147,4 +147,17 @@ export class UserService {
       data: { status: status as Status },
     });
   }
+
+  // ✅ Supprimer un utilisateur
+  async deleteUser(id: number): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new BadRequestException('Utilisateur non trouvé');
+    }
+
+    await this.prisma.user.delete({ where: { id } });
+
+    return { message: 'Utilisateur supprimé avec succès' };
+  }
 }

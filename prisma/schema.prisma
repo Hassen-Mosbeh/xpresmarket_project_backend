@@ -26,6 +26,7 @@ model product {
   category     category? @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "product_ibfk_1")
 
   @@index([category_id], map: "category_id")
+  orders       order[] 
 }
 model Contact {
   id           Int      @id @default(autoincrement())
@@ -57,7 +58,25 @@ model User {
   createdAt          DateTime   @default(now())
   resetCode          String? 
   resetCodeExpiresAt DateTime?
-
   status             Status     @default(active)
+  orders             order[]
+
+}
+model order {
+  order_id           Int        @id @default(autoincrement())
+  user_id            Int
+  product_id         Int
+  payement_method    String       @db.VarChar(50)
+  date               DateTime     @default(now())
+  status             orderStatus  @default(Pending)
+  total_amount       Decimal      @db.Decimal(10,2)
+  // relations 
+  user               User         @relation (fields: [user_id],references : [id])
+  product            product      @relation (fields: [product_id], references :[product_id])
+  @@map ("orders")
+}
+enum orderStatus{
+  Pending 
+  Delivered 
 }
 

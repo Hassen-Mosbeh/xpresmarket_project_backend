@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -16,7 +17,6 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   // ✅ Récupérer tous les utilisateurs
-  // @UseGuards(JwtGuard) // Décommente si tu veux sécuriser cette route
   @Get()
   async getAllUsers() {
     return this.userService.getAllUsers();
@@ -46,12 +46,8 @@ export class UserController {
   }
 
   // ✅ Mettre à jour uniquement le statut d’un utilisateur
-  //@UseGuards(JwtGuard)
-  @Patch(':id/status') // Correction du conflit ici
-  async updateUserStatus(
-    @Param('id') id: string,
-    @Body('status') status: string
-  ) {
+  @Patch(':id/status')
+  async updateUserStatus(@Param('id') id: string, @Body('status') status: string) {
     const userId = Number(id);
     if (isNaN(userId)) {
       throw new BadRequestException('Invalid user ID');
@@ -64,7 +60,19 @@ export class UserController {
 
     return this.userService.updateStatus(
       userId,
-      status as 'active' | 'inactive' | 'deleted'
+      status as 'active' | 'inactive' | 'deleted',
     );
+  }
+
+  // ✅ Supprimer un utilisateur
+  //@UseGuards(JwtGuard)
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    const userId = Number(id);
+    if (isNaN(userId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    return this.userService.deleteUser(userId);
   }
 }
