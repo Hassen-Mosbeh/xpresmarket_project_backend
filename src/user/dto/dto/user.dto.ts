@@ -23,6 +23,10 @@ export class CreateUserDto {
   @IsIn(['Buyer', 'Seller'])
   profile: ProfileType;
 
+  @IsOptional()
+  @IsString()
+  picture?:string;
+
   @IsString()
   password: string;
 
@@ -50,6 +54,10 @@ export class UpdateUserDto{
   @IsOptional()
   @IsString()
   username?: string;
+
+  @IsOptional()
+  @IsString()
+  picture?:string;
   
   @IsOptional()
   @IsString()
