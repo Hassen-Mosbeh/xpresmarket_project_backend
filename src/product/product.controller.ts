@@ -54,9 +54,16 @@ export class ProductController {
 
   @Delete(':product_id')
   async deleteProduct(
+    @Res() response: Response,
     @Param('product_id') product_id: number,
-  ): Promise<product> {
-    return this.productService.deleteProduct(product_id);
+    
+  ): Promise<any> {
+    const result = await this.productService.deleteProduct(product_id);
+    return response.status(200).json({
+      status: "Ok!",
+      message:"Product deleted Successfully",
+      result: result,
+    });
   }
 
   // @Put(':product_id')
