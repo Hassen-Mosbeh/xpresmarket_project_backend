@@ -24,25 +24,25 @@ model product {
   image        String?   @db.VarChar(255)
   category_id  Int?
   category     category? @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "product_ibfk_1")
+  orderItems   OrderItem[]
 
   @@index([category_id], map: "category_id")
-  orders       order[] 
 }
+
 model Contact {
   id           Int      @id @default(autoincrement())
   name         String   @db.VarChar(255)
-  email        String   @unique @db.VarChar(255) // rendre l'email unique
+  email        String   @unique @db.VarChar(255)
   phone_number String   @db.VarChar(20)
   subject      String   @db.VarChar(255)
   content      String   @db.Text
 }
+
 enum Status {
   active
   inactive
   deleted
 }
-
-
 
 model User {
   id                 Int        @id @default(autoincrement())
@@ -59,24 +59,38 @@ model User {
   resetCode          String? 
   resetCodeExpiresAt DateTime?
   status             Status     @default(active)
-  orders             order[]
-
-}
-model order {
-  order_id           Int        @id @default(autoincrement())
-  user_id            Int
-  product_id         Int
-  payement_method    String       @db.VarChar(50)
-  date               DateTime     @default(now())
-  status             orderStatus  @default(Pending)
-  total_amount       Decimal      @db.Decimal(10,2)
-  // relations 
-  user               User         @relation (fields: [user_id],references : [id])
-  product            product      @relation (fields: [product_id], references :[product_id])
-  @@map ("orders")
-}
-enum orderStatus{
-  Pending 
-  Delivered 
+  orders             Order[]
 }
 
+model Order {
+  order_id        Int         @id @default(autoincrement())
+  user_id         Int
+  payment_method  String      @db.VarChar(50)
+  payment_id      String?     // Référence au paiement Stripe
+  date            DateTime    @default(now())
+  status          orderStatus @default(Pending)
+  total_amount    Decimal     @db.Decimal(10, 2)
+  notes           String?
+  user            User        @relation(fields: [user_id], references: [id])
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  item_id     Int     @id @default(autoincrement())
+  order_id    Int
+  product_id  Int
+  quantity    Int
+  price       Decimal @db.Decimal(10, 2) // Prix au moment de la commande
+  order       Order   @relation(fields: [order_id], references: [order_id])
+  product     product @relation(fields: [product_id], references: [product_id])
+
+  @@map("order_items")
+}
+
+enum orderStatus {
+  Pending     // Non traitée
+  Processing  // En préparation
+  Ready       // Prête à être livrée
+}

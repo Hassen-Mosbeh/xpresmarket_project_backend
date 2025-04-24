@@ -7,6 +7,7 @@ import { MailerModule } from './Module/mailer.module';
 import { ContactModule } from './contact/contact.module';
 import { StripeModule } from './stripe/stripe.module';
 import { OrderModule } from './order/order.module';
+import { PrismaModule } from './prisma.module';
 @Module({
   imports: [
     ProductModule,
@@ -17,6 +18,7 @@ import { OrderModule } from './order/order.module';
     MailerModule,
     StripeModule,
     OrderModule,
+    PrismaModule,
   ],
   controllers: [],
 })

@@ -11,9 +11,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     await this.$disconnect(); // Disconnect from the database when the module is destroyed
   }
 
-  async enableShutdownHooks(app: INestApplication) { // Use NestJS's shutdown hooks to disconnect Prisma
-    
-   app.enableShutdownHooks();
+  async enableShutdownHooks(app: INestApplication) {
+    app.enableShutdownHooks();
   }
 
   async findByEmail(email: string) {

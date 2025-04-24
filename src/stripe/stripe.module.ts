@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { StripeController } from './stripe.controller';
+import { PrismaModule } from 'src/prisma.module';  
 
-// Le module Stripe permet de regrouper tous les composants liés à Stripe : service + controller
 @Module({
-  controllers: [StripeController], 
-  providers: [StripeService],      // Le service contient la logique métier (ex: création du paiement)
+  imports: [PrismaModule],
+  controllers: [StripeController],
+  providers: [StripeService],
 })
 export class StripeModule {}
