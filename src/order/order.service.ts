@@ -19,6 +19,14 @@ export class OrderService {
       // Vérifier que l'utilisateur existe
       const user = await this.prisma.user.findUnique({
         where: { id: createOrderDto.user_id },
+        select: {  // Filtrer pour ne récupérer que les champs nécessaires
+          username: true,
+          email: true,
+          company_email: true,
+          company_name: true,
+          company_adresse: true,
+          company_tel: true,
+        },
       });
       if (!user) {
         throw new NotFoundException(`Utilisateur ${createOrderDto.user_id} introuvable`);
@@ -57,7 +65,7 @@ export class OrderService {
               product: true,
             },
           },
-          user: true,
+          user: true,  // L'utilisateur complet est inclus ici
         },
       });
 
@@ -82,7 +90,16 @@ export class OrderService {
       return await this.prisma.order.findMany({
         where,
         include: {
-          user: { select: { id: true, email: true } },
+          user: { 
+            select: {  
+              username: true,
+              email: true,
+              company_email: true,
+              company_name: true,
+              company_adresse: true,
+              company_tel: true,
+            },
+          },
           items: {
             include: { product: true },
           },
@@ -100,7 +117,16 @@ export class OrderService {
       const order = await this.prisma.order.findUnique({
         where: { order_id: id },
         include: {
-          user: { select: { id: true, email: true, telephone: true } },
+          user: { 
+            select: {  
+              username: true,
+              email: true,
+              company_email: true,
+              company_name: true,
+              company_adresse: true,
+              company_tel: true,
+            },
+          },
           items: {
             include: {
               product: true,
@@ -135,7 +161,16 @@ export class OrderService {
         where: { order_id: id },
         data: { status },
         include: {
-          user: { select: { email: true } },
+          user: { 
+            select: {  // Filtrer les données utilisateur retournées
+              username: true,
+              email: true,
+              company_email: true,
+              company_name: true,
+              company_adresse: true,
+              company_tel: true,
+            },
+          },
           items: {
             include: { product: true },
           },
