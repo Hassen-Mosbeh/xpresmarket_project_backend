@@ -12,10 +12,11 @@ class OrderItemDto {
 
   @IsNumber()
   @IsPositive()
-  price: number; // Prix unitaire au moment de la commande
+  price: number; 
 }
 
 export class CreateOrderDto {
+
   @IsNumber()
   @IsPositive()
   user_id: number;
@@ -35,7 +36,5 @@ export class CreateOrderDto {
   @IsPositive()
   total_amount: number;
 
-  @IsString()
-  @IsOptional()
-  notes?: string;
+  
 }

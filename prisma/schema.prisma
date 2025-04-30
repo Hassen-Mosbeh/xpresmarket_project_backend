@@ -70,7 +70,6 @@ model Order {
   date            DateTime    @default(now())
   status          orderStatus @default(Pending)
   total_amount    Decimal     @db.Decimal(10, 2)
-  notes           String?
   user            User        @relation(fields: [user_id], references: [id])
   items           OrderItem[]
 

@@ -49,7 +49,6 @@ export class OrderService {
           payment_method: createOrderDto.payment_method,
           payment_id: createOrderDto.payment_id,
           total_amount: createOrderDto.total_amount,
-          notes: createOrderDto.notes,
           status: orderStatus.Pending,
           items: {
             create: createOrderDto.items.map((item) => ({
@@ -162,7 +161,7 @@ export class OrderService {
         data: { status },
         include: {
           user: { 
-            select: {  // Filtrer les données utilisateur retournées
+            select: {  
               username: true,
               email: true,
               company_email: true,
