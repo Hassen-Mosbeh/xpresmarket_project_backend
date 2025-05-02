@@ -5,7 +5,6 @@ import { KpiService } from './kpi.service';
 export class KpiController {
   constructor(private readonly kpiService: KpiService) {}
 
-
   @Get('active-products')
   getActiveProducts() {
     return this.kpiService.getActiveProductListingsKPI();
@@ -14,5 +13,10 @@ export class KpiController {
   @Get('new-users')
   getNewUsers() {
     return this.kpiService.getNewUsersKPI();
+  }
+
+  @Get('user-roles')
+  async getUserRolesKpi() {
+    return this.kpiService.getUserRolesKpi();
   }
 }
