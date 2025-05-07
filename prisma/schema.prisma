@@ -14,17 +14,6 @@ model category {
   product        product[]
 }
 
-model Contact {
-  id          Int        @id @default(autoincrement())
-  name        String     @db.VarChar(255)
-  email       String     @db.VarChar(255)
-  phone_number String    @db.VarChar(20)
-  subject     String     @db.VarChar(255)
-  content     String     @db.Text
-  user_id     Int
-
-}
-
 model product {
   product_id   Int       @id @default(autoincrement())
   product_name String    @db.VarChar(255)
@@ -40,6 +29,7 @@ model product {
 
   category_id  Int?
   category     category? @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "product_ibfk_1")
+  orderItems   OrderItem[]
 
   
 
@@ -51,20 +41,68 @@ enum Profile {
   Seller
 }
 
-model User {
-  id               Int       @id @default(autoincrement())
-  username         String?   @db.VarChar(191)
-  email            String    @unique
-  company_email    String?   @db.VarChar(255)
-  profile          Profile   @default(Buyer)
-  picture          String?
-  password         String
-  telephone        String    @db.VarChar(191)
-  company_name     String?   @db.VarChar(191)
-  company_adresse  String?   @db.VarChar(191)
-  company_tel      String?   @db.VarChar(191)
-  createdAt        DateTime  @default(now())
-  resetCode        String? 
-  resetCodeExpiresAt DateTime? 
+model Contact {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  email        String   @unique @db.VarChar(255)
+  phone_number String   @db.VarChar(20)
+  subject      String   @db.VarChar(255)
+  content      String   @db.Text
+}
+
+enum Status {
+  active
+  inactive
+  deleted
+}
+
+
+  id                 Int        @id @default(autoincrement())
+  username           String?    @db.VarChar(191)
+  email              String     @unique
+  company_email      String?    @db.VarChar(255)
+  profile            String     @default("Buyer")
+  password           String
+  telephone          String     @db.VarChar(191)
+  company_name       String?    @db.VarChar(191)
+  company_adresse    String?    @db.VarChar(191)
+  company_tel        String?    @db.VarChar(191)
+  createdAt          DateTime   @default(now())
+  resetCode          String? 
+  resetCodeExpiresAt DateTime?
+  status             Status     @default(active)
+  orders             Order[]
   products product[]
+  picture          String?
+
+model Order {
+  order_id        Int         @id @default(autoincrement())
+  user_id         Int
+  payment_method  String      @db.VarChar(50)
+  payment_id      String?     // Référence au paiement Stripe
+  date            DateTime    @default(now())
+  status          orderStatus @default(Pending)
+  total_amount    Decimal     @db.Decimal(10, 2)
+  user            User        @relation(fields: [user_id], references: [id])
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  item_id     Int     @id @default(autoincrement())
+  order_id    Int
+  product_id  Int
+  quantity    Int
+  price       Decimal @db.Decimal(10, 2) // Prix au moment de la commande
+  order       Order   @relation(fields: [order_id], references: [order_id])
+  product     product @relation(fields: [product_id], references: [product_id])
+
+  @@map("order_items")
+}
+
+enum orderStatus {
+  Pending     // Non traitée
+  Processing  // En préparation
+  Ready       // Prête à être livrée
 }

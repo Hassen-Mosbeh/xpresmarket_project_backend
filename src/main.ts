@@ -14,7 +14,7 @@ async function bootstrap() {
 
   
   app.enableCors({
-    // origin: 'http://localhost:3000', // Allow only Next.js frontend
+    
     methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'],
     credentials: true, // Allow cookies/auth if needed
   });

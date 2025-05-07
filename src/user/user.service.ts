@@ -1,31 +1,36 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateUserDto,UpdateUserDto } from './dto/dto/user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto/dto/user.dto';
 import { hash } from 'bcrypt';
+import { Status } from './dto/dto/user.dto';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
+  // ✅ Création d'un utilisateur
   async create(dto: CreateUserDto) {
     const user = await this.prisma.user.findUnique({
-      where: {
-        email: dto.email,
-      },
+      where: { email: dto.email },
     });
 
-    if (user) throw new ConflictException('Email already exists');
+    if (user) {
+      throw new ConflictException('Email already exists');
+    }
+
+    const hashedPassword = await hash(dto.password, 10);
 
     const newUser = await this.prisma.user.create({
       data: {
         email: dto.email,
-        password: await hash(dto.password, 10),
+        password: hashedPassword,
         profile: dto.profile,
         telephone: dto.telephone,
+        status: dto.status ?? Status.active,
         ...(dto.username && { username: dto.username }),
         ...(dto.company_name && { company_name: dto.company_name }),
         ...(dto.company_adresse && { company_adresse: dto.company_adresse }),
-        // ...(dto.company_tel && { company_tel: dto.company_tel }),
+        ...(dto.company_tel && { company_tel: dto.company_tel }),
       },
     });
 
@@ -33,55 +38,74 @@ export class UserService {
     return result;
   }
 
+  // ✅ Trouver un utilisateur par email
   async findByEmail(email: string) {
-    console.log("🔍 findByEmail called with:", email);
-
     if (!email) {
-      console.error("❌ Error: Email is undefined in findByEmail");
-      throw new Error("Email is required");
+      throw new BadRequestException('Email is required');
     }
 
-
     return await this.prisma.user.findUnique({
-      where: {
-        email: email,
-      },
+      where: { email },
     });
   }
 
-  
+  // ✅ Trouver un utilisateur par ID
   async findById(id: number) {
-    console.log("Received ID in findById:", id);
-  
     if (!id || isNaN(id)) {
-      throw new Error(`Invalid user ID: ${id}`);
+      throw new BadRequestException('Invalid user ID');
     }
-  
+
     return await this.prisma.user.findUnique({
-      where: {
-        id: id, 
-      },
+      where: { id },
     });
   }
 
-  async update(id:number, user:any) {
+  // ✅ Récupérer tous les utilisateurs
+  async getAllUsers() {
+    const users = await this.prisma.user.findMany({
+      orderBy: { id: 'asc' },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        profile: true,
+        telephone: true,
+        status: true,
+        company_name: true,
+        company_adresse: true,
+        company_tel: true,
+        company_email: true,
+        createdAt: true,
+      },
+    });
+
+    return users;
+  }
+
+  // ✅ Mise à jour générique
+  async update(id: number, user: any) {
     return this.prisma.user.update({
       where: { id },
       data: user,
-    }); 
+    });
   }
 
+  // ✅ Mise à jour du reset code
   async updateResetCode(email: string, resetCode: string) {
     return this.prisma.updateResetCode(email, resetCode);
   }
 
+  // ✅ Mise à jour du mot de passe
   async updatePassword(email: string, hashedPassword: string) {
     return this.prisma.updatePassword(email, hashedPassword);
   }
 
-  async UpdateUser(dto: UpdateUserDto) {
+  // ✅ Mise à jour des infos utilisateur
+  async UpdateUser(dto: UpdateUserDto & { id: number }) {
+    const { id, ...data } = dto;
+
     return await this.prisma.user.update({
-      where: { id: dto.id },
+      where: { id },
       data: {
         ...(dto.username && { username: dto.username }),
         ...(dto.telephone && { telephone: dto.telephone }),
@@ -90,7 +114,51 @@ export class UserService {
         ...(dto.company_adresse && { company_adresse: dto.company_adresse }),
         ...(dto.company_tel && { company_tel: dto.company_tel }),
         ...(dto.picture && { picture: dto.picture}),
+        ...(data.status && { status: data.status as Status }),
       },
     });
+  }
+
+  // ✅ Mise à jour spécifique du status (admin only) avec logique métier
+  async updateStatus(id: number, status: Status | string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const currentStatus = user.status;
+
+    // Vérifier que le nouveau statut est valide
+    if (!Object.values(Status).includes(status as Status)) {
+      throw new BadRequestException('Invalid status value');
+    }
+
+    // Logique métier
+    if (currentStatus === Status.deleted) {
+      throw new BadRequestException("Cannot modify a deleted user");
+    }
+
+    if (currentStatus === status) {
+      throw new BadRequestException(`User is already ${status}`);
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: { status: status as Status },
+    });
+  }
+
+  // ✅ Supprimer un utilisateur
+  async deleteUser(id: number): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new BadRequestException('Utilisateur non trouvé');
+    }
+
+    await this.prisma.user.delete({ where: { id } });
+
+    return { message: 'Utilisateur supprimé avec succès' };
   }
 }
