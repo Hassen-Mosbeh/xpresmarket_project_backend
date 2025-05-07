@@ -1,5 +1,11 @@
 import { IsString, IsOptional, IsEmail, IsInt, IsIn } from 'class-validator';
 
+
+export enum ProfileType {
+  Buyer = 'Buyer',
+  Seller = 'Seller',
+}
+
 export class CreateUserDto {
 
   @IsOptional()
@@ -15,7 +21,11 @@ export class CreateUserDto {
 
   @IsString()
   @IsIn(['Buyer', 'Seller'])
-  profile: string;
+  profile: ProfileType;
+
+  @IsOptional()
+  @IsString()
+  picture?:string;
 
   @IsString()
   password: string;
@@ -44,6 +54,10 @@ export class UpdateUserDto{
   @IsOptional()
   @IsString()
   username?: string;
+
+  @IsOptional()
+  @IsString()
+  picture?:string;
   
   @IsOptional()
   @IsString()

@@ -6,8 +6,6 @@ import {
   Param,
   Post,
   Patch,
-  // InternalServerErrorException,
-  // NotFoundException,
   Req,
   Res,
 } from '@nestjs/common';

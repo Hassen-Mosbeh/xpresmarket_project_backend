@@ -13,6 +13,7 @@ model category {
   descp_category String?   @db.Text
   product        product[]
 }
+
 model Contact {
   id          Int        @id @default(autoincrement())
   name        String     @db.VarChar(255)
@@ -22,9 +23,8 @@ model Contact {
   content     String     @db.Text
   user_id     Int
 
-
-
 }
+
 model product {
   product_id   Int       @id @default(autoincrement())
   product_name String    @db.VarChar(255)
@@ -32,11 +32,23 @@ model product {
   price        Decimal   @db.Decimal(10, 2)
   stock        Int       @default(0)
   status       Boolean?  @default(true)
-  image        String?   @db.VarChar(255)
+  image        String?   @db.VarChar(255) 
+  createdAtpnproduct    DateTime  @default(now())
+
+  ownerId     Int
+  owner       User   @relation(fields: [ownerId], references: [id])
+
   category_id  Int?
   category     category? @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "product_ibfk_1")
 
+  
+
   @@index([category_id], map: "category_id")
+}
+
+enum Profile {
+  Buyer
+  Seller
 }
 
 model User {
@@ -44,7 +56,8 @@ model User {
   username         String?   @db.VarChar(191)
   email            String    @unique
   company_email    String?   @db.VarChar(255)
-  profile          String    @default("Buyer")
+  profile          Profile   @default(Buyer)
+  picture          String?
   password         String
   telephone        String    @db.VarChar(191)
   company_name     String?   @db.VarChar(191)
@@ -53,4 +66,5 @@ model User {
   createdAt        DateTime  @default(now())
   resetCode        String? 
   resetCodeExpiresAt DateTime? 
+  products product[]
 }
