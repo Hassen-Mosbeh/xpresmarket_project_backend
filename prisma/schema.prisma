@@ -39,6 +39,7 @@ model product {
 enum Profile {
   Buyer
   Seller
+  Admin
 }
 
 model Contact {
@@ -56,7 +57,7 @@ enum Status {
   deleted
 }
 
-
+model User{
   id                 Int        @id @default(autoincrement())
   username           String?    @db.VarChar(191)
   email              String     @unique
@@ -74,7 +75,7 @@ enum Status {
   orders             Order[]
   products product[]
   picture          String?
-
+}
 model Order {
   order_id        Int         @id @default(autoincrement())
   user_id         Int

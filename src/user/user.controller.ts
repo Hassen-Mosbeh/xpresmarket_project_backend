@@ -32,8 +32,7 @@ export class UserController {
     }
     return this.userService.findById(userId);
   }
-  return this.userService.findById(userId);
-}
+
   @UseGuards(JwtGuard)
   @Patch(':id')
   async updateProfile(@Param('id') id: string, @Body() dto: UpdateUserDto) {
