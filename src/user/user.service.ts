@@ -114,7 +114,7 @@ export class UserService {
         ...(dto.company_adresse && { company_adresse: dto.company_adresse }),
         ...(dto.company_tel && { company_tel: dto.company_tel }),
         ...(dto.picture && { picture: dto.picture}),
-        ...(data.status && { status: data.status as Status }),
+        ...(dto.status && { status: data.status as Status }),
       },
     });
   }
