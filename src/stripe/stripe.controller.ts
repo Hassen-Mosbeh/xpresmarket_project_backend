@@ -11,15 +11,14 @@ export class StripeController {
    * @param body 
    * @returns Le clientSecret pour confirmer le paiement côté client
    */
-  @Post('create-payment-intent')
-  async createPaymentIntent(
-    @Body() body: { amount: number; user_id: number; product_id: number },
-  ) {
-    const clientSecret = await this.stripeService.createPaymentIntent(
-      body.amount,
-      body.user_id,
-      body.product_id,
-    );
+   @Post('create-payment-intent')
+  async createPaymentIntent(@Body() body: { amount: number; user_id: string }) {
+    const { amount, user_id } = body; // Destructure here
+    if (!amount || !user_id) {
+      throw new Error('Amount and user_id are required');
+    }
+    
+    const clientSecret = await this.stripeService.createPaymentIntent(amount, user_id);
     return { clientSecret };
   }
 

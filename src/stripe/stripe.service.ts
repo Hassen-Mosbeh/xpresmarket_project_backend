@@ -15,20 +15,27 @@ export class StripeService {
     });
   }
 
-  async createPaymentIntent(amount: number, user_id: number, product_id: number) {
+  async createPaymentIntent(amount: number, user_id: string) {
+    if (!amount || !user_id) {
+      throw new Error('Amount and user_id are required');
+    }
+  
+    console.log("Creating payment intent with:", { amount, user_id });
+  
     const paymentIntent = await this.stripe.paymentIntents.create({
-      amount: amount * 100,
+      amount: Math.round(amount * 100), // Stripe expects amount in cents
       currency: 'usd',
       metadata: {
         user_id: user_id.toString(),
-        product_id: product_id.toString(),
-        price: amount.toString(), // utile pour le détail de l’item
+      },
+      automatic_payment_methods: {
+        enabled: true,
       },
     });
-
+  
     return paymentIntent.client_secret;
   }
-
+  
   async handleWebhook(req: Request, res: Response, sig: string) {
     let event: Stripe.Event;
 

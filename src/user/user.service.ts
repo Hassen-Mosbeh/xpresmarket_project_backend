@@ -30,7 +30,7 @@ export class UserService {
         ...(dto.username && { username: dto.username }),
         ...(dto.company_name && { company_name: dto.company_name }),
         ...(dto.company_adresse && { company_adresse: dto.company_adresse }),
-        ...(dto.company_tel && { company_tel: dto.company_tel }),
+        // ...(dto.company_tel && { company_tel: dto.company_tel }),
       },
     });
 
