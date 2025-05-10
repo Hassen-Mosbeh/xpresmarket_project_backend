@@ -61,12 +61,26 @@ export class OrderController {
    * @param updateOrderStatusDto Nouveau statut
    * @returns Commande mise à jour
    */
+
+  @Get('/buyer/:userId')
+  async getOrdersForBuyer(@Param('userId') userId: string) {
+    return this.orderService.getOrdersForBuyer(+userId);
+  }
+
+  @Get('/seller/:ownerId')
+  async getOrdersForSeller(@Param('ownerId') ownerId: string) {
+    return this.orderService.getOrdersForSeller(+ownerId);
+  }
+
   @Patch(':id/status')
   @UsePipes(new ValidationPipe({ transform: true }))
   async updateOrderStatus(
     @Param('id') id: string,
     @Body() updateOrderStatusDto: UpdateOrderStatusDto,
   ) {
-    return this.orderService.updateOrderStatus(+id, updateOrderStatusDto.status);
+    return this.orderService.updateOrderStatus(
+      +id,
+      updateOrderStatusDto.status,
+    );
   }
 }

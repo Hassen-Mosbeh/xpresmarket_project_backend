@@ -19,7 +19,8 @@ export class OrderService {
       // Vérifier que l'utilisateur existe
       const user = await this.prisma.user.findUnique({
         where: { id: createOrderDto.user_id },
-        select: {  // Filtrer pour ne récupérer que les champs nécessaires
+        select: {
+          // Filtrer pour ne récupérer que les champs nécessaires
           username: true,
           email: true,
           company_email: true,
@@ -29,7 +30,9 @@ export class OrderService {
         },
       });
       if (!user) {
-        throw new NotFoundException(`Utilisateur ${createOrderDto.user_id} introuvable`);
+        throw new NotFoundException(
+          `Utilisateur ${createOrderDto.user_id} introuvable`,
+        );
       }
 
       // Vérifier que chaque produit existe
@@ -64,7 +67,7 @@ export class OrderService {
               product: true,
             },
           },
-          user: true,  // L'utilisateur complet est inclus ici
+          user: true, // L'utilisateur complet est inclus ici
         },
       });
 
@@ -76,8 +79,46 @@ export class OrderService {
       );
       throw error instanceof NotFoundException
         ? error
-        : new InternalServerErrorException('Erreur lors de la création de la commande');
+        : new InternalServerErrorException(
+            'Erreur lors de la création de la commande',
+          );
     }
+  }
+
+  // 👤 For BUYERS
+  async getOrdersForBuyer(userId: number) {
+    return this.prisma.order.findMany({
+      where: { user_id: userId },
+      include: {
+        user: true,
+        items: {
+          include: { product: true },
+        },
+      },
+      orderBy: { date: 'desc' },
+    });
+  }
+
+  // 🧑‍💼 For SELLERS
+  async getOrdersForSeller(ownerId: number) {
+    return this.prisma.order.findMany({
+      where: {
+        items: {
+          some: {
+            product: {
+              ownerId: ownerId,
+            },
+          },
+        },
+      },
+      include: {
+        user: true,
+        items: {
+          include: { product: true },
+        },
+      },
+      orderBy: { date: 'desc' },
+    });
   }
 
   async getOrders(status?: string, userId?: number) {
@@ -89,8 +130,8 @@ export class OrderService {
       return await this.prisma.order.findMany({
         where,
         include: {
-          user: { 
-            select: {  
+          user: {
+            select: {
               username: true,
               email: true,
               company_email: true,
@@ -116,8 +157,8 @@ export class OrderService {
       const order = await this.prisma.order.findUnique({
         where: { order_id: id },
         include: {
-          user: { 
-            select: {  
+          user: {
+            select: {
               username: true,
               email: true,
               company_email: true,
@@ -160,8 +201,8 @@ export class OrderService {
         where: { order_id: id },
         data: { status },
         include: {
-          user: { 
-            select: {  
+          user: {
+            select: {
               username: true,
               email: true,
               company_email: true,
@@ -176,7 +217,10 @@ export class OrderService {
         },
       });
     } catch (error) {
-      this.logger.error(`Erreur mise à jour statut commande ${id}`, error.stack);
+      this.logger.error(
+        `Erreur mise à jour statut commande ${id}`,
+        error.stack,
+      );
       throw error instanceof NotFoundException
         ? error
         : new InternalServerErrorException('Erreur serveur');
