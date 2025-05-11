@@ -19,9 +19,9 @@ export class ContactController {
     return this.contactService.findOne(Number(id));
   }
 
-  // 🔹 Créer un nouveau contact
+
   @Post()
-  async create(@Body() data: CreateContactDto): Promise<Contact> {  // Utiliser le DTO ici
+  async create(@Body() data: CreateContactDto): Promise<Contact> { 
     return this.contactService.create(data);
   }
 }

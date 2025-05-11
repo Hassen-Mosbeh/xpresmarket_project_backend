@@ -28,7 +28,6 @@ export class ContactService {
         phone_number: data.phone_number,
         subject: data.subject,
         content: data.content,
-        // ✅ Supprimé user: { connect: ... }
       },
     });
   }
