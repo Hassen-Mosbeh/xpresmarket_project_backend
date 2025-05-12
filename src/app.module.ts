@@ -10,6 +10,8 @@ import { KpiModule } from './dashboard/admin/kpi.module';
 import { MailerModule } from './Module/mailer.module';
 import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
+import { KpiBuyerModule } from './dashboard/buyer/kpiBuyer.module';
+import { KpiSellerModule } from './dashboard/seller/kpiSeller.module';
 @Module({
   imports: [
     ProductModule,
@@ -22,6 +24,8 @@ import { Module } from '@nestjs/common';
     OrderModule,
     PrismaModule,
     KpiModule,
+    KpiBuyerModule,
+    KpiSellerModule,
   ],
   controllers: [],
 
