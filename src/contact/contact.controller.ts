@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Param, Body } from '@nestjs/common';
-import { Contact } from '@prisma/client';
+import { contact } from '@prisma/client';
 import { ContactService } from './contact.service';
 import { CreateContactDto } from './contactdto/contact.dto'; // Import du DTO
 
@@ -9,19 +9,19 @@ export class ContactController {
 
   // 🔹 Récupérer tous les contacts
   @Get()
-  async findAll(): Promise<Contact[]> {
+  async findAll(): Promise<contact[]> {
     return this.contactService.findAll();
   }
 
   // 🔹 Récupérer un contact spécifique par ID
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Contact | null> {
+  async findOne(@Param('id') id: string): Promise<contact | null> {
     return this.contactService.findOne(Number(id));
   }
 
 
   @Post()
-  async create(@Body() data: CreateContactDto): Promise<Contact> { 
+  async create(@Body() data: CreateContactDto): Promise<contact> { 
     return this.contactService.create(data);
   }
 }

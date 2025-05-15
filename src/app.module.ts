@@ -12,6 +12,9 @@ import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
 import { KpiBuyerModule } from './dashboard/buyer/kpiBuyer.module';
 import { KpiSellerModule } from './dashboard/seller/kpiSeller.module';
+import { ChatGateway } from './chat/chat.gateway';
+import { ChatService } from './chat/chat.service';
+import { ChatModule } from './chat/chat.module';
 @Module({
   imports: [
     ProductModule,
@@ -26,8 +29,10 @@ import { KpiSellerModule } from './dashboard/seller/kpiSeller.module';
     KpiModule,
     KpiBuyerModule,
     KpiSellerModule,
+    ChatModule,
   ],
   controllers: [],
+  providers: [ChatGateway, ChatService],
 
 })
 export class AppModule {}
