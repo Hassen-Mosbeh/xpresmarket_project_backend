@@ -42,6 +42,7 @@ export class AuthService {
       id: user.id,
       email: user.email,
       profile: user.profile,
+      company_adresse: user.company_adresse,
       sub: {
         id: user.id,
       },
@@ -53,6 +54,7 @@ export class AuthService {
         email: user.email,
         profile: user.profile,
         username: user.username,
+         company_adresse: user.company_adresse,
       },
       backendTokens: {
         accessToken: await this.jwtService.signAsync(payload, {
