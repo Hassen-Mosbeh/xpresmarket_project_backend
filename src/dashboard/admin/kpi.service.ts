@@ -98,4 +98,44 @@ async getUserRolesKpi() {
   };
 }
 
+  async getUserStatusCounts() {
+    const [inactive, deleted] = await Promise.all([
+      
+      this.prisma.user.count({ where: { status: 'inactive' } }),
+      this.prisma.user.count({ where: { status: 'deleted' } }),
+    ]);
+
+    return { inactive, deleted };
+  }
+
+  // 2. Count Contact Requests (Handled = total)
+  async getContactRequestCount() {
+    const totalRequests = await this.prisma.contact.count();
+    return { totalRequests };
+  }
+
+  // 3. Get Top 6 Most Frequent Company Addresses
+  async getTopCompanyAddresses(limit = 6) {
+    const result = await this.prisma.user.groupBy({
+      by: ['company_adresse'],
+      where: {
+        company_adresse: { not: null },
+      },
+      _count: {
+        company_adresse: true,
+      },
+      orderBy: {
+        _count: {
+          company_adresse: 'desc',
+        },
+      },
+      take: limit,
+    });
+
+    return result.map((entry) => ({
+      address: entry.company_adresse,
+      count: entry._count.company_adresse,
+    }));
+  }
+
 }

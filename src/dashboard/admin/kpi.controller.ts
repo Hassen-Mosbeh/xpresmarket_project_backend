@@ -19,4 +19,19 @@ export class KpiController {
   async getUserRolesKpi() {
     return this.kpiService.getUserRolesKpi();
   }
+
+   @Get('user-status')
+  getUserStatus() {
+    return this.kpiService.getUserStatusCounts();
+  }
+
+  @Get('contact-requests')
+  getContactRequests() {
+    return this.kpiService.getContactRequestCount();
+  }
+
+  @Get('top-company-addresses')
+  getTopCompanyAddresses() {
+    return this.kpiService.getTopCompanyAddresses();
+  }
 }
