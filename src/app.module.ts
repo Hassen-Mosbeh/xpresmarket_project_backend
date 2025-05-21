@@ -15,6 +15,7 @@ import { KpiSellerModule } from './dashboard/seller/kpiSeller.module';
 import { ChatGateway } from './chat/chat.gateway';
 import { ChatService } from './chat/chat.service';
 import { ChatModule } from './chat/chat.module';
+import { TransactionModule } from './transactions/transaction.module';
 @Module({
   imports: [
     ProductModule,
@@ -30,6 +31,7 @@ import { ChatModule } from './chat/chat.module';
     KpiBuyerModule,
     KpiSellerModule,
     ChatModule,
+    TransactionModule
   ],
   controllers: [],
   providers: [ChatGateway, ChatService],
