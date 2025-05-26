@@ -63,8 +63,7 @@ export class UserController {
     );
   }
 
-  // ✅ Supprimer un utilisateur
-  //@UseGuards(JwtGuard)
+
   @Delete(':id')
   async deleteUser(@Param('id') id: string) {
     const userId = Number(id);

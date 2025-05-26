@@ -1,4 +1,8 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto, UpdateUserDto } from './dto/dto/user.dto';
 import { hash } from 'bcrypt';
@@ -113,7 +117,7 @@ export class UserService {
         ...(dto.company_name && { company_name: dto.company_name }),
         ...(dto.company_adresse && { company_adresse: dto.company_adresse }),
         ...(dto.company_tel && { company_tel: dto.company_tel }),
-        ...(dto.picture && { picture: dto.picture}),
+        ...(dto.picture && { picture: dto.picture }),
         ...(dto.status && { status: data.status as Status }),
       },
     });
@@ -136,7 +140,7 @@ export class UserService {
 
     // Logique métier
     if (currentStatus === Status.deleted) {
-      throw new BadRequestException("Cannot modify a deleted user");
+      throw new BadRequestException('Cannot modify a deleted user');
     }
 
     if (currentStatus === status) {
@@ -157,6 +161,40 @@ export class UserService {
       throw new BadRequestException('Utilisateur non trouvé');
     }
 
+    // 1. Delete all messages where user is sender or receiver
+    await this.prisma.message.deleteMany({
+      where: {
+        OR: [{ senderId: id }, { receiverId: id }],
+      },
+    });
+
+    // 2. Delete all OrderItems for the user's orders
+    const userOrders = await this.prisma.order.findMany({
+      where: { user_id: id },
+      select: { order_id: true },
+    });
+
+    const orderIds = userOrders.map((order) => order.order_id);
+
+    if (orderIds.length > 0) {
+      await this.prisma.orderItem.deleteMany({
+        where: {
+          order_id: { in: orderIds },
+        },
+      });
+    }
+
+    // 3. Delete the user's orders
+    await this.prisma.order.deleteMany({
+      where: { user_id: id },
+    });
+
+    // 4. Delete the user's products
+    await this.prisma.product.deleteMany({
+      where: { ownerId: id },
+    });
+
+    // 5. Now finally delete the user
     await this.prisma.user.delete({ where: { id } });
 
     return { message: 'Utilisateur supprimé avec succès' };

@@ -11,3 +11,4 @@ getBuyerKpi(@Param('id', ParseIntPipe) id: number) {
   return this.buyerKpiService.getBuyerKpis(id);
 }
 }
+  
