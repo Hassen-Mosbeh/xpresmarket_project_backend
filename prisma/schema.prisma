@@ -65,24 +65,25 @@ model OrderItem {
 model contact {
   id           Int    @id @default(autoincrement())
   name         String @db.VarChar(255)
-  email        String @unique(map: "Contact_email_key") @db.VarChar(255)
+  email        String @db.VarChar(255)
   phone_number String @db.VarChar(20)
   subject      String @db.VarChar(255)
   content      String @db.Text
 }
 
-model message {
-  id                            Int      @id @default(autoincrement())
-  senderId                      Int
-  receiverId                    Int
-  content                       String   @db.Text
-  timestamp                     DateTime @default(now())
-  user_message_receiverIdTouser user     @relation("message_receiverIdTouser", fields: [receiverId], references: [id], map: "Message_receiverId_fkey")
-  user_message_senderIdTouser   user     @relation("message_senderIdTouser", fields: [senderId], references: [id], map: "Message_senderId_fkey")
+  model message {
+    id                            Int      @id @default(autoincrement())
+    senderId                      Int
+    receiverId                    Int
+    read                          Boolean  @default(false) 
+    content                       String   @db.Text
+    timestamp                     DateTime @default(now())
+    user_message_receiverIdTouser user     @relation("message_receiverIdTouser", fields: [receiverId], references: [id], map: "Message_receiverId_fkey")
+    user_message_senderIdTouser   user     @relation("message_senderIdTouser", fields: [senderId], references: [id], map: "Message_senderId_fkey")
 
-  @@index([receiverId], map: "Message_receiverId_fkey")
-  @@index([senderId], map: "Message_senderId_fkey")
-}
+    @@index([receiverId], map: "Message_receiverId_fkey")
+    @@index([senderId], map: "Message_senderId_fkey")
+  }
 
 model user {
   id                               Int         @id @default(autoincrement())

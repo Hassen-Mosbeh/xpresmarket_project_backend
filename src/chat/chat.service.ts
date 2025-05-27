@@ -26,7 +26,10 @@ export class ChatService {
     return message;
   }
 
-  async getMessagesBetweenUsers(user1: number, user2: number): Promise<message[]> {
+  async getMessagesBetweenUsers(
+    user1: number,
+    user2: number,
+  ): Promise<message[]> {
     const messages = await this.prisma.message.findMany({
       where: {
         OR: [
@@ -39,5 +42,33 @@ export class ChatService {
 
     return messages;
   }
-  
+
+  async getUnreadCount(userId: number): Promise<Record<number, number>> {
+    const messages = await this.prisma.message.findMany({
+      where: {
+        receiverId: userId,
+        read: false,
+      },
+    });
+
+    const counts: Record<number, number> = {};
+    for (const msg of messages) {
+      counts[msg.senderId] = (counts[msg.senderId] || 0) + 1;
+    }
+
+    return counts;
+  }
+
+  async markMessagesAsRead(userId: number, partnerId: number): Promise<void> {
+    await this.prisma.message.updateMany({
+      where: {
+        receiverId: userId,
+        senderId: partnerId,
+        read: false,
+      },
+      data: {
+        read: true,
+      },
+    });
+  }
 }
