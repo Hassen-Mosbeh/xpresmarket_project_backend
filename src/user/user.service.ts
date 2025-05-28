@@ -153,50 +153,67 @@ export class UserService {
     });
   }
 
-  // ✅ Supprimer un utilisateur
-  async deleteUser(id: number): Promise<{ message: string }> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+  //  Supprimer un utilisateur
+async deleteUser(id: number): Promise<{ message: string }> {
+  const user = await this.prisma.user.findUnique({ where: { id } });
 
-    if (!user) {
-      throw new BadRequestException('Utilisateur non trouvé');
-    }
+  if (!user) {
+    throw new BadRequestException('Utilisateur non trouvé');
+  }
 
-    // 1. Delete all messages where user is sender or receiver
-    await this.prisma.message.deleteMany({
+  // 1. Delete all messages where user is sender or receiver
+  await this.prisma.message.deleteMany({
+    where: {
+      OR: [{ senderId: id }, { receiverId: id }],
+    },
+  });
+
+  // 2. Delete all OrderItems for the user's orders
+  const userOrders = await this.prisma.order.findMany({
+    where: { user_id: id },
+    select: { order_id: true },
+  });
+
+  const userOrderIds = userOrders.map((order) => order.order_id);
+
+  if (userOrderIds.length > 0) {
+    await this.prisma.orderItem.deleteMany({
       where: {
-        OR: [{ senderId: id }, { receiverId: id }],
+        order_id: { in: userOrderIds },
       },
     });
-
-    // 2. Delete all OrderItems for the user's orders
-    const userOrders = await this.prisma.order.findMany({
-      where: { user_id: id },
-      select: { order_id: true },
-    });
-
-    const orderIds = userOrders.map((order) => order.order_id);
-
-    if (orderIds.length > 0) {
-      await this.prisma.orderItem.deleteMany({
-        where: {
-          order_id: { in: orderIds },
-        },
-      });
-    }
-
-    // 3. Delete the user's orders
-    await this.prisma.order.deleteMany({
-      where: { user_id: id },
-    });
-
-    // 4. Delete the user's products
-    await this.prisma.product.deleteMany({
-      where: { ownerId: id },
-    });
-
-    // 5. Now finally delete the user
-    await this.prisma.user.delete({ where: { id } });
-
-    return { message: 'Utilisateur supprimé avec succès' };
   }
+
+  // 3. Delete order items related to the seller's products
+  const sellerProducts = await this.prisma.product.findMany({
+    where: { ownerId: id },
+    select: { product_id: true },
+  });
+
+  const productIds = sellerProducts.map((product) => product.product_id);
+
+  if (productIds.length > 0) {
+    await this.prisma.orderItem.deleteMany({
+      where: {
+        product_id: { in: productIds },
+      },
+    });
+  }
+
+  // 4. Delete the user's orders
+  await this.prisma.order.deleteMany({
+    where: { user_id: id },
+  });
+
+  // 5. Delete the user's products
+  await this.prisma.product.deleteMany({
+    where: { ownerId: id },
+  });
+
+  // 6. Now finally delete the user
+  await this.prisma.user.delete({ where: { id } });
+
+  return { message: 'Utilisateur supprimé avec succès' };
+}
+
 }
