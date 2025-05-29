@@ -12,7 +12,7 @@ import { Status } from './dto/dto/user.dto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  // ✅ Création d'un utilisateur
+  //  Création d'un utilisateur
   async create(dto: CreateUserDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
@@ -42,7 +42,7 @@ export class UserService {
     return result;
   }
 
-  // ✅ Trouver un utilisateur par email
+  //  Trouver un utilisateur par email
   async findByEmail(email: string) {
     if (!email) {
       throw new BadRequestException('Email is required');
@@ -53,7 +53,7 @@ export class UserService {
     });
   }
 
-  // ✅ Trouver un utilisateur par ID
+  //  Trouver un utilisateur par ID
   async findById(id: number) {
     if (!id || isNaN(id)) {
       throw new BadRequestException('Invalid user ID');
@@ -64,7 +64,7 @@ export class UserService {
     });
   }
 
-  // ✅ Récupérer tous les utilisateurs
+  //  Récupérer tous les utilisateurs
   async getAllUsers() {
     const users = await this.prisma.user.findMany({
       orderBy: { id: 'asc' },
@@ -86,7 +86,7 @@ export class UserService {
     return users;
   }
 
-  // ✅ Mise à jour générique
+  //  Mise à jour générique
   async update(id: number, user: any) {
     return this.prisma.user.update({
       where: { id },
@@ -94,17 +94,17 @@ export class UserService {
     });
   }
 
-  // ✅ Mise à jour du reset code
+  //  Mise à jour du reset code
   async updateResetCode(email: string, resetCode: string) {
     return this.prisma.updateResetCode(email, resetCode);
   }
 
-  // ✅ Mise à jour du mot de passe
+  //  Mise à jour du mot de passe
   async updatePassword(email: string, hashedPassword: string) {
     return this.prisma.updatePassword(email, hashedPassword);
   }
 
-  // ✅ Mise à jour des infos utilisateur
+  //  Mise à jour des infos utilisateur
   async UpdateUser(dto: UpdateUserDto & { id: number }) {
     const { id, ...data } = dto;
 
@@ -123,7 +123,7 @@ export class UserService {
     });
   }
 
-  // ✅ Mise à jour spécifique du status (admin only) avec logique métier
+  //  Mise à jour spécifique du status (admin only) avec logique métier
   async updateStatus(id: number, status: Status | string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
 
